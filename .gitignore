@@ -1,0 +1,9 @@
+#caches
+__pycache__
+
+# envs
+.venv
+.env
+
+# test files
+*test*.*
