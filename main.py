@@ -8,11 +8,9 @@ def read_image(image_path: str):
 
 
 # display image
-def display(image_path: str):
-    print("Displaying image now")
-    image = read_image(image_path)
+def display_image(window_name: str, image):
 
-    cv2.imshow("Chair", image)
+    cv2.imshow(window_name, image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -35,8 +33,7 @@ def capture_from_webcam():
     cv2.destroyAllWindows()
 
 
-def resize_it(width: float, height: float, image_path: str, show: bool = False):
-    image = read_image(image_path)
+def resize_it(width: float, height: float, image, show: bool = False):
 
     # gives the image size
     og_y, og_x = image.shape[:2]
@@ -48,14 +45,11 @@ def resize_it(width: float, height: float, image_path: str, show: bool = False):
     # for half the scale
     # resized = cv2.resize(src=image, dsize=None, fx=0.5, fy=0.5)
     if show:
-        cv2.imshow("RESIZED IMAGE", resized)
-
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        display_image("RESIZED IMAGE", resized)
     return resized
 
 
-def draw_shapes_N_text(shape: str, image_path: str, input_text: Optional[str] = None):
+def draw_shapes_N_text(shape: str, image, input_text: Optional[str] = None):
     shapes = {
         "circle": cv2.circle,
         "rectangle": cv2.rectangle,
@@ -65,84 +59,92 @@ def draw_shapes_N_text(shape: str, image_path: str, input_text: Optional[str] = 
     if shape not in shapes.keys():
         return
 
-    # image = read_and_display(image_path)
-    image = resize_it(500, 500, image_path)
-    center = image.shape[0] // 2, image.shape[1] // 2
+    resized = resize_it(500, 500, image)
+    center = resized.shape[0] // 2, resized.shape[1] // 2
     thickness = 2
 
     if shape == "circle":
         radius = 69
         color = (255, 0, 0)
-        shapes[shape](image, center, radius, color, thickness)
+        shapes[shape](resized, center, radius, color, thickness)
 
     elif shape == "rectangle":
         top_left = (200, 200)
         bottom_right = (500, 500)
         color = (0, 255, 0)
-        shapes[shape](image, top_left, bottom_right, color, thickness)
+        shapes[shape](resized, top_left, bottom_right, color, thickness)
 
     elif shape == "line":
         start = (0, 0)
         end = (900, 50)
         color = (0, 0, 255)
-        shapes[shape](image, start, end, color, thickness)
+        shapes[shape](resized, start, end, color, thickness)
 
     elif shape == "text" and input_text:
         origin = tuple([center[0], list(center)[1] // 2])
         font = cv2.FONT_HERSHEY_PLAIN
         font_scale = 1
         color = (0, 69, 45)
-        shapes[shape](image, input_text, origin, font, font_scale, color, thickness)
+        shapes[shape](resized, input_text, origin, font, font_scale, color, thickness)
 
-    cv2.imshow(f"{shape.upper()} DRAWN", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    display_image(f"{shape.upper()} DRAWN", resized)
 
 
-def translate_it(image_path: str, tx: int, ty: int):
+def translate_it(image, tx: int, ty: int):
 
-    image = resize_it(500, 500, image_path)
+    resized = resize_it(500, 500, image)
 
-    rows, cols = image.shape[:2]
+    rows, cols = resized.shape[:2]
     translation_matrix = np.float32(np.array([[1, 0, tx], [0, 1, ty]]))
-    translated = cv2.warpAffine(image, np.asarray(translation_matrix), (cols, rows))
+    translated = cv2.warpAffine(resized, np.asarray(translation_matrix), (cols, rows))
 
-    cv2.imshow("Translation window", translated)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    display_image("Translation window", translated)
 
 
-def rotate_it(image_path: str, angle: float, scale: float = 1.0):
-    image = resize_it(500, 500, image_path)
+def rotate_it(image, angle: float, scale: float = 1.0):
+    resized = resize_it(500, 500, image)
     # for now center of the image itself
-    center = image.shape[0] // 2, image.shape[1] // 2
+    center = resized.shape[0] // 2, resized.shape[1] // 2
 
-    rows, cols = image.shape[:2]
+    rows, cols = resized.shape[:2]
     # gives the matrix for rotation
     matrix = cv2.getRotationMatrix2D(center, angle, scale)
     # actually rotating it by appling transformation
-    rotated = cv2.warpAffine(image, matrix, (cols, rows))
+    rotated = cv2.warpAffine(resized, matrix, (cols, rows))
 
-    cv2.imshow("Rotation window", rotated)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    display_image("Rotation window", rotated)
+
+
+def color_space_conversion(image, color_code: int):
+    resized = resize_it(500, 500, image)
+    converted = cv2.cvtColor(resized, color_code)
+
+    display_image("OG image", resized)
+    display_image("Converted image", converted)
 
 
 def main():
-    display("pink_chair.png")
+
+    image = read_image("pink_chair.png")
+    display_image("Image display", image)
     capture_from_webcam()
 
     # providing the desired size here
-    resize_it(500, 500, "pink_chair.png", show=True)
+    resize_it(500, 500, image, show=True)
 
     # function examples
-    draw_shapes_N_text("circle", "pink_chair.png")
-    draw_shapes_N_text("rectangle", "pink_chair.png")
-    draw_shapes_N_text("line", "pink_chair.png")
-    draw_shapes_N_text("text", "pink_chair.png", "Pink chair it is")
+    draw_shapes_N_text("circle", image)
+    draw_shapes_N_text("rectangle", image)
+    draw_shapes_N_text("line", image)
+    draw_shapes_N_text("text", image, "Pink chair it is")
 
-    translate_it("pink_chair.png", -100, 200)
-    rotate_it("pink_chair.png", 45.0)
+    translate_it(image, -100, 200)
+    rotate_it(image, 45.0)
+
+    # changes to grayscale
+    color_space_conversion(image, cv2.COLOR_RGB2GRAY)
+    # changes to hsv
+    color_space_conversion(image, cv2.COLOR_RGB2HSV)
 
 
 if __name__ == "__main__":
