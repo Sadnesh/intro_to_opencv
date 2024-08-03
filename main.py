@@ -1,5 +1,6 @@
 import cv2
 from typing import Optional
+import numpy as np
 
 
 def read_image(image_path: str):
@@ -84,7 +85,7 @@ def draw_shapes_N_text(shape: str, image_path: str, input_text: Optional[str] = 
         start = (0, 0)
         end = (900, 50)
         color = (0, 0, 255)
-        cv2.line(image, start, end, color, thickness)
+        shapes[shape](image, start, end, color, thickness)
 
     elif shape == "text" and input_text:
         origin = tuple([center[0], list(center)[1] // 2])
@@ -94,6 +95,35 @@ def draw_shapes_N_text(shape: str, image_path: str, input_text: Optional[str] = 
         shapes[shape](image, input_text, origin, font, font_scale, color, thickness)
 
     cv2.imshow(f"{shape.upper()} DRAWN", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def translate_it(image_path: str, tx: int, ty: int):
+
+    image = resize_it(500, 500, image_path)
+
+    rows, cols = image.shape[:2]
+    translation_matrix = np.float32(np.array([[1, 0, tx], [0, 1, ty]]))
+    translated = cv2.warpAffine(image, np.asarray(translation_matrix), (cols, rows))
+
+    cv2.imshow("Translation window", translated)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def rotate_it(image_path: str, angle: float, scale: float = 1.0):
+    image = resize_it(500, 500, image_path)
+    # for now center of the image itself
+    center = image.shape[0] // 2, image.shape[1] // 2
+
+    rows, cols = image.shape[:2]
+    # gives the matrix for rotation
+    matrix = cv2.getRotationMatrix2D(center, angle, scale)
+    # actually rotating it by appling transformation
+    rotated = cv2.warpAffine(image, matrix, (cols, rows))
+
+    cv2.imshow("Rotation window", rotated)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -110,6 +140,9 @@ def main():
     draw_shapes_N_text("rectangle", "pink_chair.png")
     draw_shapes_N_text("line", "pink_chair.png")
     draw_shapes_N_text("text", "pink_chair.png", "Pink chair it is")
+
+    translate_it("pink_chair.png", -100, 200)
+    rotate_it("pink_chair.png", 45.0)
 
 
 if __name__ == "__main__":
