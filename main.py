@@ -1,5 +1,6 @@
 import cv2
 from typing import Optional
+import cv2.data
 import numpy as np
 
 
@@ -123,6 +124,31 @@ def color_space_conversion(image, color_code: int):
     display_image("Converted image", converted)
 
 
+def detect_edge(image):
+    resized = resize_it(500, 500, image)
+    detected = cv2.Canny(resized, 119.0, 120.0)
+    display_image("detected image", detected)
+
+
+def detect_face(image):
+    resized = resize_it(500, 500, image)
+    cascade = cv2.CascadeClassifier(
+        cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+    )
+    gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
+    # scaleFactor to compensate diff face size,
+    # minNeighbours to specifies the number of neighbors each candidate rectangle should have to retain it, (i don't completely understand it)
+    # minSize to define min size of the detected face, for ex in a group photo where faces are small
+    face = cascade.detectMultiScale(
+        gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
+    )
+    # drawing bounding box on the detected face
+    for a, b, c, d in face:
+        cv2.rectangle(resized, (a, b), (a + c, b + d), (255, 0, 0), 2)
+
+    display_image("face", resized)
+
+
 def main():
 
     image = read_image("pink_chair.png")
@@ -145,6 +171,10 @@ def main():
     color_space_conversion(image, cv2.COLOR_RGB2GRAY)
     # changes to hsv
     color_space_conversion(image, cv2.COLOR_RGB2HSV)
+
+    detect_edge(image)
+    # you can use your own face here, but remember to rename it to testing.jpg
+    detect_face(read_image("testing.jpg"))
 
 
 if __name__ == "__main__":
