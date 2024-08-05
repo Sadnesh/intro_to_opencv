@@ -149,32 +149,58 @@ def detect_face(image):
     display_image("face", resized)
 
 
+def blur_N_smooth(image):
+    """this is a complicated one, will need to make more use to know it better"""
+    resized = resize_it(500, 500, image)
+    ksize = (31, 31)
+
+    gauss_blur = cv2.GaussianBlur(
+        resized, ksize, sigmaX=1.0, sigmaY=2.0
+    )  # the second parameter ie ksize must be +ve and odd
+    display_image("Gaussian blurred image", gauss_blur)
+
+    median_blur = cv2.medianBlur(
+        resized, 7
+    )  # the second parameter ie ksize must be +ve and odd
+    display_image("Median blurred image", median_blur)
+
+    # d=30: Diameter of each pixel neighborhood used during filtering. If it is a non-positive number, it is computed from sigmaSpace.
+    # signaColor=100.0: sigmaColor, the filter sigma in the color space. A larger value means that farther colors within the pixel neighborhood will be mixed together, resulting in larger areas of semi-equal color.
+    # sigmaSpace=20.0: sigmaSpace, the filter sigma in the coordinate space. A larger value means that farther pixels will influence each other as long as their colors are close enough.
+
+    filter = cv2.bilateralFilter(resized, 30, 100.0, 20.0)
+    display_image("filter", filter)
+
+
+
+
 def main():
 
     image = read_image("pink_chair.png")
-    display_image("Image display", image)
-    capture_from_webcam()
+    # display_image("Image display", image)
+    # capture_from_webcam()
 
-    # providing the desired size here
-    resize_it(500, 500, image, show=True)
+    # # providing the desired size here
+    # resize_it(500, 500, image, show=True)
 
-    # function examples
-    draw_shapes_N_text("circle", image)
-    draw_shapes_N_text("rectangle", image)
-    draw_shapes_N_text("line", image)
-    draw_shapes_N_text("text", image, "Pink chair it is")
+    # # function examples
+    # draw_shapes_N_text("circle", image)
+    # draw_shapes_N_text("rectangle", image)
+    # draw_shapes_N_text("line", image)
+    # draw_shapes_N_text("text", image, "Pink chair it is")
 
-    translate_it(image, -100, 200)
-    rotate_it(image, 45.0)
+    # translate_it(image, -100, 200)
+    # rotate_it(image, 45.0)
 
-    # changes to grayscale
-    color_space_conversion(image, cv2.COLOR_RGB2GRAY)
-    # changes to hsv
-    color_space_conversion(image, cv2.COLOR_RGB2HSV)
+    # # changes to grayscale
+    # color_space_conversion(image, cv2.COLOR_RGB2GRAY)
+    # # changes to hsv
+    # color_space_conversion(image, cv2.COLOR_RGB2HSV)
 
-    detect_edge(image)
-    # you can use your own face here, but remember to rename it to testing.jpg
-    detect_face(read_image("testing.jpg"))
+    # detect_edge(image)
+    # # you can use your own face here, but remember to rename it to testing.jpg
+    # detect_face(read_image("testing.jpg"))
+    blur_N_smooth(image)
 
 
 if __name__ == "__main__":
