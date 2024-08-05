@@ -172,35 +172,48 @@ def blur_N_smooth(image):
     display_image("filter", filter)
 
 
+def detect_contour(image):
+    """The contour detecting only works with grayscale images, and this topic is very complicated too"""
+    resized = resize_it(500, 500, image)
+    gray = cv2.cvtColor(resized, cv2.COLOR_RGB2GRAY)
+
+    _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+
+    contours, _ = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    cv2.drawContours(resized, contours, -1, (255, 0, 0), 2)
+    display_image("Contours", resized)
 
 
 def main():
 
     image = read_image("pink_chair.png")
-    # display_image("Image display", image)
-    # capture_from_webcam()
+    display_image("Image display", image)
+    capture_from_webcam()
 
-    # # providing the desired size here
-    # resize_it(500, 500, image, show=True)
+    # providing the desired size here
+    resize_it(500, 500, image, show=True)
 
-    # # function examples
-    # draw_shapes_N_text("circle", image)
-    # draw_shapes_N_text("rectangle", image)
-    # draw_shapes_N_text("line", image)
-    # draw_shapes_N_text("text", image, "Pink chair it is")
+    # function examples
+    draw_shapes_N_text("circle", image)
+    draw_shapes_N_text("rectangle", image)
+    draw_shapes_N_text("line", image)
+    draw_shapes_N_text("text", image, "Pink chair it is")
 
-    # translate_it(image, -100, 200)
-    # rotate_it(image, 45.0)
+    translate_it(image, -100, 200)
+    rotate_it(image, 45.0)
 
-    # # changes to grayscale
-    # color_space_conversion(image, cv2.COLOR_RGB2GRAY)
-    # # changes to hsv
-    # color_space_conversion(image, cv2.COLOR_RGB2HSV)
+    # changes to grayscale
+    color_space_conversion(image, cv2.COLOR_RGB2GRAY)
+    # changes to hsv
+    color_space_conversion(image, cv2.COLOR_RGB2HSV)
 
-    # detect_edge(image)
-    # # you can use your own face here, but remember to rename it to testing.jpg
-    # detect_face(read_image("testing.jpg"))
+    detect_edge(image)
+    # you can use your own face here, but remember to rename it to testing.jpg
+    detect_face(read_image("testing.jpg"))
     blur_N_smooth(image)
+    detect_contour(image)
+    detect_contour(read_image("testing.jpg"))
 
 
 if __name__ == "__main__":
