@@ -12,20 +12,29 @@ while True:
 
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     # finds red in video
-    lower_limit = np.array([100, 100, 100])
-    upper_limit = np.array([255, 255, 255])
+    lower_red = np.array([100, 100, 100])
+    upper_red = np.array([255, 255, 255])
+    red_mask = cv.inRange(hsv, lower_red, upper_red)
 
-    mask = cv.inRange(hsv, lower_limit, upper_limit)
+    # finds blue in video
+    lower_blue = np.array([110, 100, 100])
+    upper_blue = np.array([130, 255, 255])
+    blue_mask = cv.inRange(hsv, lower_blue, upper_blue)
 
-    res = cv.bitwise_and(frame, frame, mask=mask)
+    combined_mask = cv.bitwise_or(red_mask, blue_mask)
+
+    res = cv.bitwise_and(frame, frame, mask=combined_mask)
 
     cv.imshow("frame", frame)
-    cv.imshow("mask", mask)
+    cv.imshow("blue mask", blue_mask)
+    cv.imshow("red mask", red_mask)
     cv.imshow("res", res)
 
     # if cv.waitKey(5) & 0xFF == 27: close when 'esc' pressed
     if cv.waitKey(5) & 0xFF == ord("q"):
         break
+
+cam.release()
 cv.destroyAllWindows()
 
 # find hsv value by giving bgr value
