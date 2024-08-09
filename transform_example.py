@@ -24,5 +24,5 @@ cv.waitKey(0)
 
 
 # to test with this repo's hello.png the command will be,
-""" python transform_example.py --image hello.png --coords "[(73, 239), (356, 117), (475, 265), (187, 443)]"
+""" python transform_example.py --image images/hello.png --coords "[(73, 239), (356, 117), (475, 265), (187, 443)]"
 """

@@ -71,10 +71,10 @@ def draw_rectangle(image):
 
 
 def save_image(image):
-    file_name = input("Enter the filename where you want to save the image")
-    if file_name.lower() == "save here":
+    file_name = input("Enter the filename where you want to save the image: ")
+    if file_name.strip().lower() == "save here":
         cv.imwrite(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "edited_image"),
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "edited_image.png"),
             image,
         )
         return

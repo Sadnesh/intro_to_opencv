@@ -187,7 +187,7 @@ def detect_contour(image):
 
 def main():
 
-    image = read_image("pink_chair.png")
+    image = read_image("images/pink_chair.png")
     display_image("Image display", image)
     capture_from_webcam()
 
@@ -210,10 +210,10 @@ def main():
 
     detect_edge(image)
     # you can use your own face here, but remember to rename it to testing.jpg
-    detect_face(read_image("testing.jpg"))
+    detect_face(read_image("images/testing.jpg"))
     blur_N_smooth(image)
     detect_contour(image)
-    detect_contour(read_image("testing.jpg"))
+    detect_contour(read_image("images/testing.jpg"))
 
 
 if __name__ == "__main__":

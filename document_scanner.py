@@ -1,5 +1,5 @@
 # To use simply run
-"""python document_scanner.py -i hello.png"""
+"""python document_scanner.py -i images/hello.png"""
 
 import imutils
 import argparse

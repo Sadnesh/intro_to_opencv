@@ -61,13 +61,13 @@ def adaptive_thresholding(img) -> None:
 
 
 def main() -> None:
-    img = cv.imread("gradient.png", cv.IMREAD_GRAYSCALE)
+    img = cv.imread("images/gradient.png", cv.IMREAD_GRAYSCALE)
     img = cv.resize(
         img, None, fx=0.5, fy=0.5
     )  # image was way too big, so scaling down to half
     assert img is not None, "file could not be read, check with os.path.exists()"
     simple_thresholding(img)
-    img = cv.imread("sudoku.png", cv.IMREAD_GRAYSCALE)
+    img = cv.imread("images/sudoku.png", cv.IMREAD_GRAYSCALE)
     adaptive_thresholding(img)
 
 
