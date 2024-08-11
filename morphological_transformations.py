@@ -51,3 +51,13 @@ display_image("Closing", closing)
 gradient = cv.morphologyEx(img, cv.MORPH_GRADIENT, kernel)
 display_image("Gradient", gradient)
 
+# TOP HAT
+# difference between input image and opening of the image
+kernel = np.ones((9, 9), np.uint8)  # to demonstrate use-case
+tophat = cv.morphologyEx(img, cv.MORPH_TOPHAT, kernel)
+display_image("Top Hat", tophat)
+
+# BLACK HAT
+# difference between input image and closing of the image
+blackhat = cv.morphologyEx(img, cv.MORPH_BLACKHAT, kernel)
+display_image("Top Hat", blackhat)
