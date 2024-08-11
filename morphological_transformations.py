@@ -31,17 +31,23 @@ dilation = cv.dilate(img, kernel, iterations=1)
 display_image("Dilation", dilation)
 
 # OPENING
-img = get_image("images/outer_noisy_j.png")
+noisy_img1 = get_image("images/outer_noisy_j.png")
 # a bit larger images made me increase the kernel size to show the effect of noise reduction
-kernel = np.ones((15, 15), np.uint8)
+noisy_kernel = np.ones((15, 15), np.uint8)
 
-opening = cv.morphologyEx(img, cv.MORPH_OPEN, kernel)
-display_image("Noisy image", img)
+opening = cv.morphologyEx(noisy_img1, cv.MORPH_OPEN, noisy_kernel)
+display_image("Noisy image", noisy_img1)
 display_image("Opening", opening)
 
 
 # CLOSING
-img = get_image("images/inner_noisy_j.png")
-closing = cv.morphologyEx(img, cv.MORPH_CLOSE, kernel)
-display_image("Noisy image", img)
-display_image("Opening", closing)
+noisy_img2 = get_image("images/inner_noisy_j.png")
+closing = cv.morphologyEx(noisy_img2, cv.MORPH_CLOSE, noisy_kernel)
+display_image("Noisy image", noisy_img2)
+display_image("Closing", closing)
+
+# MORPHOLOGICAL GRADIENT
+# difference between dilation and erosion of an image
+gradient = cv.morphologyEx(img, cv.MORPH_GRADIENT, kernel)
+display_image("Gradient", gradient)
+
