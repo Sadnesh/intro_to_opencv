@@ -32,4 +32,21 @@ mask = cv.inRange(img, lower_blue, upper_blue)
 # select all the white areas of the mask and change to green
 img[mask != 0] = [0, 255, 0]
 
-display_image("sth", img)
+display_image("Color changed Image", img)
+
+# if it is grayscale image then it will return only rows and cols
+(rows, cols, channels) = img.shape
+
+# for image size just do
+size = img.size
+
+# for data type of the image
+datatype = img.dtype
+
+print(rows, cols, channels, size, datatype)
+
+ball = img[230:283, 270:320]
+# testing
+# display_image("test", ball)
+img[225:278, 130:180] = ball
+display_image("cropped and pasted", img)
