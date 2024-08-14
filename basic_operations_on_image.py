@@ -8,6 +8,7 @@ TO LEARN:
 
 import cv2 as cv
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def display_image(title: str, img):
@@ -54,6 +55,7 @@ display_image("cropped and pasted", img)
 # we can split this way as well
 # b, g, r = cv.split(img)
 
+# using only one will make the image appear any of the described color otherwise it will appear black
 img[:, :, 0] = 0  # to make blue pixels to zero (image will appear a bit yellowish)
 img[:, :, 1] = 0  # to make green pixels to zero (image will appear a bit magenta-ish)
 img[:, :, 2] = 0  # to make red pixels to zero (image will appear a bit cyan-ish)
@@ -62,3 +64,22 @@ img[:, :, 2] = 0  # to make red pixels to zero (image will appear a bit cyan-ish
 # img = cv.merge((b, g, r))
 display_image("merged", img)
 
+data = 10
+img = cv.imread("images/letter_j.png")
+replicate = cv.copyMakeBorder(img, data, data, data, data, cv.BORDER_REPLICATE)
+reflect = cv.copyMakeBorder(img, data, data, data, data, cv.BORDER_REFLECT)
+reflect101 = cv.copyMakeBorder(img, data, data, data, data, cv.BORDER_REFLECT_101)
+wrap = cv.copyMakeBorder(img, data, data, data, data, cv.BORDER_WRAP)
+constant = cv.copyMakeBorder(
+    img, data, data, data, data, cv.BORDER_CONSTANT, value=(255, 0, 0)
+)
+plt.subplot(231), plt.imshow(img, "gray"), plt.title("ORIGINAL")  # type:ignore
+plt.subplot(232), plt.imshow(replicate, "gray"), plt.title("REPLICATE")  # type:ignore
+plt.subplot(233), plt.imshow(reflect, "gray"), plt.title("REFLECT")  # type:ignore
+plt.subplot(234), plt.imshow(reflect101, "gray"), plt.title(
+    "REFLECT_101"
+)  # type:ignore
+plt.subplot(235), plt.imshow(wrap, "gray"), plt.title("WARP")  # type:ignore
+plt.subplot(236), plt.imshow(constant, "gray"), plt.title("CONSTANT")  # type:ignore
+
+plt.show()
