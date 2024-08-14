@@ -50,3 +50,15 @@ ball = img[230:283, 270:320]
 # display_image("test", ball)
 img[225:278, 130:180] = ball
 display_image("cropped and pasted", img)
+
+# we can split this way as well
+# b, g, r = cv.split(img)
+
+img[:, :, 0] = 0  # to make blue pixels to zero (image will appear a bit yellowish)
+img[:, :, 1] = 0  # to make green pixels to zero (image will appear a bit magenta-ish)
+img[:, :, 2] = 0  # to make red pixels to zero (image will appear a bit cyan-ish)
+
+# and this way we can merge
+# img = cv.merge((b, g, r))
+display_image("merged", img)
+
