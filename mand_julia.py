@@ -5,7 +5,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 # the most abstracted method
-Image.effect_mandelbrot((4000, 4000), (-3, -2.5, 2, 2.5), 100).show()
+# Image.effect_mandelbrot((4000, 4000), (-3, -2.5, 2, 2.5), 100).show()
 
 
 # function to yield both mandelbrot and julia sets
@@ -27,11 +27,12 @@ def julia(candidate, parameter):
 mand_gen = mandelbrot(1)
 julia_gen = julia(1, 0.25)
 
-for _ in range(10):
-    print(next(mand_gen))
+"""Uncomment to see how each function behaves"""
+# for _ in range(10):
+#     print(next(mand_gen))
 
-for _ in range(10):
-    print(next(julia_gen))
+# for _ in range(10):
+#     print(next(julia_gen))
 
 
 # plotting using matplotlib
@@ -81,6 +82,38 @@ def show_using_pillow():
     c = complex_matrix(-2, 0.5, -1.5, 1.5, 512)
     image = Image.fromarray(~is_stable(c, num_iterations=20))  # type:ignore
     image.show()
+
+
+
+"""NOTE: TO USE THE FOLLOWING CLASS IN PYTHON TERMINAL DO FOLLOWING
+>>> from mand_julia import MandelbrotSet
+>>> mand=MandelbrotSet(max_iters=20)      
+>>> width,height=512,512
+>>> scale=0.0075
+>>> binary="1"
+>>> from PIL import Image
+>>> image= Image.new(mode=binary,size=(width,height))
+>>> for y in range(height):
+...     for x in range(width):
+...             c=scale* complex(x-width/2, height/2-y)
+...             image.putpixel((x,y),c not in mand)         
+... 
+>>> image.show()
+"""
+from dataclasses import dataclass
+
+
+@dataclass
+class MandelbrotSet:
+    max_iters: int
+
+    def __contains__(self, c: complex) -> bool:
+        z = 0
+        for _ in range(self.max_iters):
+            z = z**2 + c
+            if abs(z) > 2:
+                return False
+        return True
 
 
 def main() -> None:
