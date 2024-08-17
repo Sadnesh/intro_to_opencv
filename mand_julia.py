@@ -84,7 +84,6 @@ def show_using_pillow():
     image.show()
 
 
-
 """NOTE: TO USE THE FOLLOWING CLASS IN PYTHON TERMINAL DO FOLLOWING
 >>> from mand_julia import MandelbrotSet
 >>> mand=MandelbrotSet(max_iters=20)      
@@ -108,12 +107,18 @@ class MandelbrotSet:
     max_iters: int
 
     def __contains__(self, c: complex) -> bool:
+        return self.stability(c) == 1
+
+    def stability(self, c: complex) -> float:
+        return self.escape_count(c) / self.max_iters
+
+    def escape_count(self, c: complex) -> int:
         z = 0
-        for _ in range(self.max_iters):
+        for itr in range(self.max_iters):
             z = z**2 + c
             if abs(z) > 2:
-                return False
-        return True
+                return itr
+        return self.max_iters
 
 
 def main() -> None:
