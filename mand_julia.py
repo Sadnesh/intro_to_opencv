@@ -85,38 +85,46 @@ def show_using_pillow():
 
 
 """NOTE: TO USE THE FOLLOWING CLASS IN PYTHON TERMINAL DO FOLLOWING
->>> from mand_julia import MandelbrotSet
->>> mand=MandelbrotSet(max_iters=20)      
->>> width,height=512,512
->>> scale=0.0075
->>> binary="1"
+>>> from mandelbrot import MandelbrotSet
+>>> mandelbrot_set = MandelbrotSet(max_iterations=20, escape_radius=1000)
+
+>>> width, height = 512, 512
+>>> scale = 0.0075
+>>> GRAYSCALE = "L"
+
 >>> from PIL import Image
->>> image= Image.new(mode=binary,size=(width,height))
+>>> image = Image.new(mode=GRAYSCALE, size=(width, height))
 >>> for y in range(height):
 ...     for x in range(width):
-...             c=scale* complex(x-width/2, height/2-y)
-...             image.putpixel((x,y),c not in mand)         
-... 
+...         c = scale * complex(x - width / 2, height / 2 - y)
+...         instability = 1 - mandelbrot_set.stability(c, smooth=True)
+...         image.putpixel((x, y), int(instability * 255))
+...
 >>> image.show()
 """
 from dataclasses import dataclass
+from math import log
 
 
 @dataclass
 class MandelbrotSet:
     max_iters: int
+    escape_radius: float = 2.0
 
     def __contains__(self, c: complex) -> bool:
         return self.stability(c) == 1
 
-    def stability(self, c: complex) -> float:
-        return self.escape_count(c) / self.max_iters
+    def stability(self, c: complex, smooth=False, clamp=True) -> float:
+        value = self.escape_count(c, smooth) / self.max_iters
+        return max(0.0, min(value, 1.0)) if clamp else value
 
-    def escape_count(self, c: complex) -> int:
+    def escape_count(self, c: complex, smooth=False) -> int | float:
         z = 0
         for itr in range(self.max_iters):
             z = z**2 + c
-            if abs(z) > 2:
+            if abs(z) > self.escape_radius:
+                if smooth:
+                    return itr + 1 - log(log(abs(z))) / log(2)
                 return itr
         return self.max_iters
 
