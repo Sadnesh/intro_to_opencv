@@ -84,24 +84,6 @@ def show_using_pillow():
     image.show()
 
 
-"""NOTE: TO USE THE FOLLOWING CLASS IN PYTHON TERMINAL DO FOLLOWING
->>> from mandelbrot import MandelbrotSet
->>> mandelbrot_set = MandelbrotSet(max_iterations=20, escape_radius=1000)
-
->>> width, height = 512, 512
->>> scale = 0.0075
->>> GRAYSCALE = "L"
-
->>> from PIL import Image
->>> image = Image.new(mode=GRAYSCALE, size=(width, height))
->>> for y in range(height):
-...     for x in range(width):
-...         c = scale * complex(x - width / 2, height / 2 - y)
-...         instability = 1 - mandelbrot_set.stability(c, smooth=True)
-...         image.putpixel((x, y), int(instability * 255))
-...
->>> image.show()
-"""
 from dataclasses import dataclass
 from math import log
 
@@ -129,10 +111,27 @@ class MandelbrotSet:
         return self.max_iters
 
 
+def run_own_code():
+    mandel = MandelbrotSet(max_iters=20, escape_radius=1000)
+    width, height = 512, 512
+    scale = 0.0075
+    GRAYSCALE = "L"
+
+    image = Image.new(mode=GRAYSCALE, size=(width, height))
+    for y in range(height):
+        for x in range(width):
+            c = scale * complex(x - width / 2, height / 2 - y)
+            instability = 1 - mandel.stability(c, smooth=True)
+            image.putpixel((x, y), int(instability * 255))
+
+    image.show()
+
+
 def main() -> None:
     show_scatter_plot()
     show_blackNwhite_image()
     show_using_pillow()
+    run_own_code()
 
 
 if __name__ == "__main__":
