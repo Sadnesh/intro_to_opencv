@@ -1,7 +1,7 @@
 """NOTE: The script is not related to opencv, I just wanted to implement mandelbrot and julia sets"""
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageEnhance
 import matplotlib.pyplot as plt
 
 # the most abstracted method
@@ -111,20 +111,63 @@ class MandelbrotSet:
         return self.max_iters
 
 
+@dataclass
+class Viewport:
+    image: Image.Image
+    center: complex
+    width: float
+
+    @property
+    def height(self):
+        return self.scale * self.image.height
+
+    @property
+    def offset(self):
+        return self.center + complex(-self.width, self.height) / 2
+
+    @property
+    def scale(self):
+        return self.width / self.image.width
+
+    def __iter__(self):
+        for y in range(self.image.height):
+            for x in range(self.image.width):
+                yield Pixel(self, x, y)
+
+
+@dataclass
+class Pixel:
+    viewport: Viewport
+    x: int
+    y: int
+
+    @property
+    def color(self):
+        return self.viewport.image.getpixel((self.x, self.y))
+
+    @color.setter
+    def color(self, value):
+        self.viewport.image.putpixel((self.x, self.y), value)
+
+    def __complex__(self):
+        return complex(self.x, -self.y) * self.viewport.scale + self.viewport.offset
+
+
+# it is not optimized so it takes long time to render the image
 def run_own_code():
-    mandel = MandelbrotSet(max_iters=20, escape_radius=1000)
+    mandel = MandelbrotSet(max_iters=256, escape_radius=1000)
     width, height = 512, 512
-    scale = 0.0075
     GRAYSCALE = "L"
+    misiurewicz_point = -0.7435 + 0.1314j
 
-    image = Image.new(mode=GRAYSCALE, size=(width, height))
-    for y in range(height):
-        for x in range(width):
-            c = scale * complex(x - width / 2, height / 2 - y)
-            instability = 1 - mandel.stability(c, smooth=True)
-            image.putpixel((x, y), int(instability * 255))
-
-    image.show()
+    image = Image.new(mode=GRAYSCALE, size=(width, height), color=1)
+    # play with the center value and width to get new positions and various fractals
+    for pixel in Viewport(image, center=misiurewicz_point, width=0.002):
+        c = complex(pixel)
+        instability = 1 - mandel.stability(c, smooth=True)
+        pixel.color = int(instability * 255)
+    enhancer = ImageEnhance.Brightness(image)
+    enhancer.enhance(1.25).show()
 
 
 def main() -> None:
