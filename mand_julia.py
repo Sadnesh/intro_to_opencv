@@ -184,11 +184,25 @@ def run_own_code():
     enhancer.enhance(1.25).show()
 
 
+def run_using_self_made_palette():
+    exterior = [(1, 1, 1)] * 50
+    interior = [(1, 1, 1)] * 5
+    gray_area = [(1 - i / 44,) * 3 for i in range(45)]
+    palette = denormalize(exterior + gray_area + interior)
+    width, height = 512, 512
+    image = Image.new(mode="RGB", size=(width, height))
+    mandelbrot_set = MandelbrotSet(max_iters=20, escape_radius=1000)
+    viewport = Viewport(image, center=-0.75, width=3.5)
+    paint(mandelbrot_set, viewport, palette, smooth=True)
+    image.show()
+
+
 def main() -> None:
     show_scatter_plot()
     show_blackNwhite_image()
     show_using_pillow()
     run_own_code()
+    run_using_self_made_palette()
 
 
 if __name__ == "__main__":
