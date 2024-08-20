@@ -3,6 +3,7 @@
 import numpy as np
 from PIL import Image, ImageEnhance
 import matplotlib.pyplot as plt
+import matplotlib
 
 # the most abstracted method
 # Image.effect_mandelbrot((4000, 4000), (-3, -2.5, 2, 2.5), 100).show()
@@ -153,19 +154,32 @@ class Pixel:
         return complex(self.x, -self.y) * self.viewport.scale + self.viewport.offset
 
 
+# helper function
+def paint(
+    mandelbrot_set: MandelbrotSet, viewport: Viewport, palette: list, smooth: bool
+):
+    for pixel in viewport:
+        stability = mandelbrot_set.stability(complex(pixel), smooth)
+        index = int(min(stability * len(palette), len(palette) - 1))
+        pixel.color = palette[index % len(palette)]
+
+
+def denormalize(palette):
+    return [tuple(int(channel * 255) for channel in color) for color in palette]
+
+
 # it is not optimized so it takes long time to render the image
 def run_own_code():
-    mandel = MandelbrotSet(max_iters=256, escape_radius=1000)
+    mandel = MandelbrotSet(max_iters=512, escape_radius=1000)
     width, height = 512, 512
-    GRAYSCALE = "L"
     misiurewicz_point = -0.7435 + 0.1314j
+    # ANY OF THESE CAN BE:``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()``
+    palette = denormalize(matplotlib.colormaps["twilight"].colors)  # type:ignore
 
-    image = Image.new(mode=GRAYSCALE, size=(width, height), color=1)
+    image = Image.new(mode="RGB", size=(width, height))
     # play with the center value and width to get new positions and various fractals
-    for pixel in Viewport(image, center=misiurewicz_point, width=0.002):
-        c = complex(pixel)
-        instability = 1 - mandel.stability(c, smooth=True)
-        pixel.color = int(instability * 255)
+    viewport = Viewport(image, center=misiurewicz_point, width=0.002)
+    paint(mandel, viewport, palette, smooth=True)
     enhancer = ImageEnhance.Brightness(image)
     enhancer.enhance(1.25).show()
 
