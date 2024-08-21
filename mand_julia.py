@@ -4,7 +4,16 @@ import numpy as np
 from PIL import Image, ImageEnhance
 import matplotlib.pyplot as plt
 import matplotlib
+from scipy.interpolate import interp1d
 
+black = (0, 0, 0)
+blue = (0, 0, 1)
+maroon = (0.5, 0, 0)
+navy = (0, 0, 0.5)
+red = (1, 0, 0)
+green = (0, 1, 0)
+lime = (0, 0.5, 0)
+white = (1, 1, 1)
 # the most abstracted method
 # Image.effect_mandelbrot((4000, 4000), (-3, -2.5, 2, 2.5), 100).show()
 
@@ -168,6 +177,18 @@ def denormalize(palette):
     return [tuple(int(channel * 255) for channel in color) for color in palette]
 
 
+# gradient functions
+def make_gradient(colors, interpolation="linear"):
+    X = [i / (len(colors) - 1) for i in range(len(colors))]
+    Y = [[color[i] for color in colors] for i in range(3)]
+    channels = [interp1d(X, y, kind=interpolation) for y in Y]
+    return lambda x: [np.clip(channel(x), 0, 1) for channel in channels]
+
+
+def make_gradient_palette(num_colors, gradient):
+    return denormalize([gradient(i / num_colors) for i in range(num_colors)])
+
+
 # it is not optimized so it takes long time to render the image
 def run_own_code():
     mandel = MandelbrotSet(max_iters=512, escape_radius=1000)
@@ -197,12 +218,31 @@ def run_using_self_made_palette():
     image.show()
 
 
+def run_gradient_fractal(colors):
+    num_colors = 256
+    mandel = MandelbrotSet(max_iters=20, escape_radius=1000)
+    gradient = make_gradient(colors, interpolation="cubic")
+    palette = make_gradient_palette(num_colors, gradient)
+
+    image = Image.new(mode="RGB", size=(512, 512))
+    viewport = Viewport(image, center=-0.75, width=3.5)
+    paint(mandel, viewport, palette, smooth=True)
+    image.show()
+
+
 def main() -> None:
     show_scatter_plot()
     show_blackNwhite_image()
     show_using_pillow()
     run_own_code()
     run_using_self_made_palette()
+
+    colors = [black, navy, blue, maroon, red, black]
+    """Some more testings, to remove banding or say to make image more smooth, 
+        the iters should be increased"""
+    # colors = [black, navy, blue, lime, green, white]
+    # colors = [white, navy, blue, lime, green, black]
+    run_gradient_fractal(colors)
 
 
 if __name__ == "__main__":
