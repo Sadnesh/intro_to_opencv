@@ -6,6 +6,7 @@ from PIL.ImageColor import getrgb
 import matplotlib.pyplot as plt
 import matplotlib
 from scipy.interpolate import interp1d
+from random import randint
 
 black = (0, 0, 0)
 blue = (0, 0, 1)
@@ -15,6 +16,49 @@ red = (1, 0, 0)
 green = (0, 1, 0)
 lime = (0, 0.5, 0)
 white = (1, 1, 1)
+
+colors_to_choose = [
+    "magma",
+    "inferno",
+    "plasma",
+    "viridis",
+    "cividis",
+    "twilight",
+    "twilight_shifted",
+    "turbo",
+    "Accent",
+    "Dark2",
+    "Paired",
+    "Pastel1",
+    "Pastel2",
+    "Set1",
+    "Set2",
+    "Set3",
+    "tab10",
+    "tab20",
+    "tab20b",
+    "tab20c",
+    "magma_r",
+    "inferno_r",
+    "plasma_r",
+    "viridis_r",
+    "cividis_r",
+    "twilight_r",
+    "twilight_shifted_r",
+    "turbo_r",
+    "Accent_r",
+    "Dark2_r",
+    "Paired_r",
+    "Pastel1_r",
+    "Pastel2_r",
+    "Set1_r",
+    "Set2_r",
+    "Set3_r",
+    "tab10_r",
+    "tab20_r",
+    "tab20b_r",
+    "tab20c_r",
+]
 
 # the most abstracted method
 # Image.effect_mandelbrot((4000, 4000), (-3, -2.5, 2, 2.5), 100).show()
@@ -202,7 +246,11 @@ def run_own_code(image: Image.Image):
     mandel = MandelbrotSet(max_iters=512, escape_radius=1000)
     misiurewicz_point = -0.7435 + 0.1314j
     # ANY OF THESE CAN BE:``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()``
-    palette = denormalize(matplotlib.colormaps["twilight"].colors)  # type:ignore
+    palette = denormalize(
+        matplotlib.colormaps[
+            colors_to_choose[randint(0, len(colors_to_choose) - 1)]
+        ].colors  # type:ignore
+    )
 
     # play with the center value and width to get new positions and various fractals
     viewport = Viewport(image, center=misiurewicz_point, width=0.002)
