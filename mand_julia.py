@@ -2,6 +2,7 @@
 
 import numpy as np
 from PIL import Image, ImageEnhance
+from PIL.ImageColor import getrgb
 import matplotlib.pyplot as plt
 import matplotlib
 from scipy.interpolate import interp1d
@@ -14,6 +15,7 @@ red = (1, 0, 0)
 green = (0, 1, 0)
 lime = (0, 0.5, 0)
 white = (1, 1, 1)
+
 # the most abstracted method
 # Image.effect_mandelbrot((4000, 4000), (-3, -2.5, 2, 2.5), 100).show()
 
@@ -189,15 +191,19 @@ def make_gradient_palette(num_colors, gradient):
     return denormalize([gradient(i / num_colors) for i in range(num_colors)])
 
 
+def hsb(hue_degrees: int, saturation: float, brightness: float):
+    return getrgb(
+        f"hsv({hue_degrees % 360}," f"{saturation * 100}%," f"{brightness * 100}%)"
+    )
+
+
 # it is not optimized so it takes long time to render the image
-def run_own_code():
+def run_own_code(image: Image.Image):
     mandel = MandelbrotSet(max_iters=512, escape_radius=1000)
-    width, height = 512, 512
     misiurewicz_point = -0.7435 + 0.1314j
     # ANY OF THESE CAN BE:``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()``
     palette = denormalize(matplotlib.colormaps["twilight"].colors)  # type:ignore
 
-    image = Image.new(mode="RGB", size=(width, height))
     # play with the center value and width to get new positions and various fractals
     viewport = Viewport(image, center=misiurewicz_point, width=0.002)
     paint(mandel, viewport, palette, smooth=True)
@@ -205,44 +211,61 @@ def run_own_code():
     enhancer.enhance(1.25).show()
 
 
-def run_using_self_made_palette():
+def run_using_self_made_palette(image: Image.Image):
     exterior = [(1, 1, 1)] * 50
     interior = [(1, 1, 1)] * 5
     gray_area = [(1 - i / 44,) * 3 for i in range(45)]
     palette = denormalize(exterior + gray_area + interior)
-    width, height = 512, 512
-    image = Image.new(mode="RGB", size=(width, height))
     mandelbrot_set = MandelbrotSet(max_iters=20, escape_radius=1000)
     viewport = Viewport(image, center=-0.75, width=3.5)
     paint(mandelbrot_set, viewport, palette, smooth=True)
     image.show()
 
 
-def run_gradient_fractal(colors):
+def run_gradient_fractal(colors, image: Image.Image):
     num_colors = 256
     mandel = MandelbrotSet(max_iters=20, escape_radius=1000)
     gradient = make_gradient(colors, interpolation="cubic")
     palette = make_gradient_palette(num_colors, gradient)
 
-    image = Image.new(mode="RGB", size=(512, 512))
     viewport = Viewport(image, center=-0.75, width=3.5)
     paint(mandel, viewport, palette, smooth=True)
     image.show()
 
 
+def run_hsb_fractal(image: Image.Image):
+    mand = MandelbrotSet(max_iters=20, escape_radius=1000)
+    for pixel in Viewport(image, center=-0.75, width=3.5):
+        stability = mand.stability(complex(pixel), smooth=True)
+        pixel.color = (
+            (0, 0, 0)
+            if stability == 1
+            else hsb(
+                hue_degrees=int(
+                    stability * 360
+                ),  # changing the value (360 ie degree to take into consideration) will create more interesting results
+                saturation=stability,
+                brightness=1,
+            )
+        )
+    image.show()
+
+
 def main() -> None:
+    image = Image.new(mode="RGB", size=(512, 512))
     show_scatter_plot()
     show_blackNwhite_image()
     show_using_pillow()
-    run_own_code()
-    run_using_self_made_palette()
+    run_own_code(image)
+    run_using_self_made_palette(image)
 
     colors = [black, navy, blue, maroon, red, black]
-    """Some more testings, to remove banding or say to make image more smooth, 
+    """Some more testings, to remove banding or say to make image more smooth,
         the iters should be increased"""
     # colors = [black, navy, blue, lime, green, white]
     # colors = [white, navy, blue, lime, green, black]
-    run_gradient_fractal(colors)
+    run_gradient_fractal(colors, image)
+    run_hsb_fractal(image)
 
 
 if __name__ == "__main__":
