@@ -28,6 +28,12 @@ def detect_corner_W_subpixel_accuracy(gray_image):
     return np.int_(ret)
 
 
+def shi_tomasi_corner_detector(gray_image):
+    corners = cv.goodFeaturesToTrack(gray_image, 25, 0.01, 10)
+    corners = np.int_(corners)
+    return corners
+
+
 def display_image(title, image):
     cv.imshow(title, image)
     cv.waitKey(0)
@@ -51,17 +57,26 @@ def main():
 
     chess_img[res1 > 0.01 * res1.max()] = [0, 0, 255]
     twisted_chess_img[res2 > 0.1 * res2.max()] = [0, 0, 255]
-    dataset_img[res3 > 0.09 * res3.max()] = [0, 0, 255]
+    copy_ = dataset_img.copy()
+    copy_[res3 > 0.09 * res3.max()] = [0, 0, 255]
 
     display_image("Normal board", chess_img)
     display_image("Twisted board", twisted_chess_img)
-    display_image("Corners detected", dataset_img)
+    display_image("Corners with Harris algo", copy_)
 
     res4 = detect_corner_W_subpixel_accuracy(cv.cvtColor(pix_img, cv.COLOR_BGR2GRAY))
     pix_img[res4[:, 1], res4[:, 0]] = [0, 0, 255]  # type:ignore
     pix_img[res4[:, 3], res4[:, 2]] = [0, 255, 0]  # type:ignore
 
+    # the detected corners are plotted in very small scale so to see results clearly, you have to zoom somehow
     display_image("Pixel Corner detection", pix_img)
+
+    corners = shi_tomasi_corner_detector(cv.cvtColor(dataset_img, cv.COLOR_BGR2GRAY))
+    for i in corners:  # type:ignore
+        x, y = i.ravel()
+        cv.circle(dataset_img, (x, y), 3, (0, 0, 255), -1)
+
+    display_image("Corners with Shi-Tomasi algo", dataset_img)
 
 
 if __name__ == "__main__":
