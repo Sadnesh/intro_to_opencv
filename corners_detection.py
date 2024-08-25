@@ -37,24 +37,29 @@ def display_image(title, image):
 def main():
     chess_board = "images/chess_board.png"
     twisted_chess_board = "images/chess_board_warped.png"
+    corner_dataset = "images/to_be_corner_detected.png"
     pixeled_path = "images/pixeled_image.png"
 
     chess_img = cv.imread(chess_board)
     twisted_chess_img = cv.imread(twisted_chess_board)
+    dataset_img = cv.imread(corner_dataset)
     pix_img = cv.imread(pixeled_path)
 
     res1 = detect_corner(cv.cvtColor(chess_img, cv.COLOR_BGR2GRAY))
     res2 = detect_corner(cv.cvtColor(twisted_chess_img, cv.COLOR_BGR2GRAY))
+    res3 = detect_corner(cv.cvtColor(dataset_img, cv.COLOR_BGR2GRAY))
 
     chess_img[res1 > 0.01 * res1.max()] = [0, 0, 255]
     twisted_chess_img[res2 > 0.1 * res2.max()] = [0, 0, 255]
+    dataset_img[res3 > 0.09 * res3.max()] = [0, 0, 255]
 
     display_image("Normal board", chess_img)
     display_image("Twisted board", twisted_chess_img)
+    display_image("Corners detected", dataset_img)
 
-    res3 = detect_corner_W_subpixel_accuracy(cv.cvtColor(pix_img, cv.COLOR_BGR2GRAY))
-    pix_img[res3[:, 1], res3[:, 0]] = [0, 0, 255]  # type:ignore
-    pix_img[res3[:, 3], res3[:, 2]] = [0, 255, 0]  # type:ignore
+    res4 = detect_corner_W_subpixel_accuracy(cv.cvtColor(pix_img, cv.COLOR_BGR2GRAY))
+    pix_img[res4[:, 1], res4[:, 0]] = [0, 0, 255]  # type:ignore
+    pix_img[res4[:, 3], res4[:, 2]] = [0, 255, 0]  # type:ignore
 
     display_image("Pixel Corner detection", pix_img)
 
