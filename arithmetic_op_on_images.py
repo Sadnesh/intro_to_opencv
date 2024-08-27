@@ -31,3 +31,31 @@ dst = cv.addWeighted(img1, 0.7, img2, 0.3, 0)
 cv.imshow("dst", dst)
 cv.waitKey(0)
 cv.destroyAllWindows()
+
+# bit-wise ops on image
+messi = cv.imread("images/messi.png")
+m_rows, m_cols = messi.shape[:2]
+
+rows, cols = img1.shape[:2]
+# specified rois
+TL = messi[0:rows, 0:cols]
+TR = messi[0:rows, m_cols - cols : m_cols]
+BL = messi[m_rows - rows : m_rows, 0:cols]
+BR = messi[m_rows - rows : m_rows, m_cols - cols : m_cols]
+
+roi = BR
+
+gray = cv.cvtColor(img1, cv.COLOR_BGR2GRAY)
+_, mask = cv.threshold(gray, 10, 255, cv.THRESH_BINARY)
+mask_inv = cv.bitwise_not(mask)
+
+bg = cv.bitwise_and(roi, roi, mask=mask_inv)
+fg = cv.bitwise_and(img1, img1, mask=mask)
+
+dst = cv.add(bg, fg)
+
+messi[m_rows - rows : m_rows, m_cols - cols : m_cols] = dst
+
+cv.imshow("results", messi)
+cv.waitKey(0)
+cv.destroyAllWindows()
