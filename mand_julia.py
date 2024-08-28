@@ -1,5 +1,6 @@
 """NOTE: The script is not related to opencv, I just wanted to implement mandelbrot and julia sets"""
 
+import cv2 as cv
 import numpy as np
 from PIL import Image, ImageEnhance
 from PIL.ImageColor import getrgb
@@ -299,6 +300,15 @@ def run_hsb_fractal(image: Image.Image):
     image.show()
 
 
+def calculate_func_time(function, *args, **kwargs):
+    """using open cv's functions to calculate time taken, instead of time module"""
+    exe1 = cv.getTickCount()
+    function(*args, **kwargs)
+    exe2 = cv.getTickCount()
+    time = (exe2 - exe1) / cv.getTickFrequency()
+    print(f"Time taken by the function {function} is : {time}")
+
+
 def main() -> None:
     image = Image.new(mode="RGB", size=(512, 512))
     show_scatter_plot()
@@ -314,6 +324,8 @@ def main() -> None:
     # colors = [white, navy, blue, lime, green, black]
     run_gradient_fractal(colors, image)
     run_hsb_fractal(image)
+
+    calculate_func_time(run_own_code, image)
 
 
 if __name__ == "__main__":
